@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.hospital.mapper.PrescriptiontotalMapper">
+    
+    <resultMap type="Prescriptiontotal" id="PrescriptiontotalResult">
+        <result property="prestId"    column="prest_id"    />
+        <result property="prestStatus"    column="prest_status"    />
+        <result property="prestCreatetime"    column="prest_createtime"    />
+        <result property="prestRemark"    column="prest_remark"    />
+    </resultMap>
+
+    <sql id="selectPrescriptiontotalVo">
+        select prest_id, prest_status, prest_createtime, prest_remark from t_medical_cpoe_prescriptiontotal
+    </sql>
+
+    <select id="selectPrescriptiontotalList" parameterType="Prescriptiontotal" resultMap="PrescriptiontotalResult">
+        <include refid="selectPrescriptiontotalVo"/>
+        <where>  
+            <if test="prestStatus != null "> and prest_status = #{prestStatus}</if>
+            <if test="prestCreatetime != null "> and prest_createtime = #{prestCreatetime}</if>
+            <if test="prestRemark != null  and prestRemark != ''"> and prest_remark like concat('%', #{prestRemark}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectPrescriptiontotalByPrestId" parameterType="Long" resultMap="PrescriptiontotalResult">
+        <include refid="selectPrescriptiontotalVo"/>
+        where prest_id = #{prestId}
+    </select>
+        
+    <insert id="insertPrescriptiontotal" parameterType="Prescriptiontotal" useGeneratedKeys="true" keyProperty="prestId">
+        insert into t_medical_cpoe_prescriptiontotal
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="prestStatus != null">prest_status,</if>
+            <if test="prestCreatetime != null">prest_createtime,</if>
+            <if test="prestRemark != null">prest_remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="prestStatus != null">#{prestStatus},</if>
+            <if test="prestCreatetime != null">#{prestCreatetime},</if>
+            <if test="prestRemark != null">#{prestRemark},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePrescriptiontotal" parameterType="Prescriptiontotal">
+        update t_medical_cpoe_prescriptiontotal
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="prestStatus != null">prest_status = #{prestStatus},</if>
+            <if test="prestCreatetime != null">prest_createtime = #{prestCreatetime},</if>
+            <if test="prestRemark != null">prest_remark = #{prestRemark},</if>
+        </trim>
+        where prest_id = #{prestId}
+    </update>
+
+    <delete id="deletePrescriptiontotalByPrestId" parameterType="Long">
+        delete from t_medical_cpoe_prescriptiontotal where prest_id = #{prestId}
+    </delete>
+
+    <delete id="deletePrescriptiontotalByPrestIds" parameterType="String">
+        delete from t_medical_cpoe_prescriptiontotal where prest_id in 
+        <foreach item="prestId" collection="array" open="(" separator="," close=")">
+            #{prestId}
+        </foreach>
+    </delete>
+</mapper>

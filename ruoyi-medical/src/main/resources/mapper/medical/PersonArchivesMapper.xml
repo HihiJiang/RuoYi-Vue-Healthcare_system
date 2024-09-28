@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.PersonArchivesMapper">
+    
+    <resultMap type="PersonArchives" id="PersonArchivesResult">
+        <result property="patientId"    column="patient_id"    />
+        <result property="patientName"    column="patient_name"    />
+        <result property="patientSex"    column="patient_sex"    />
+        <result property="patientBirthday"    column="patient_birthday"    />
+        <result property="patientIdcard"    column="patient_idcard"    />
+        <result property="patientHr"    column="patient_hr"    />
+        <result property="patientAddress"    column="patient_address"    />
+        <result property="patientNation"    column="patient_nation"    />
+        <result property="patientPhone"    column="patient_phone"    />
+        <result property="patientCreateDate"    column="patient_create_date"    />
+        <result property="deleted"    column="deleted"    />
+    </resultMap>
+
+    <sql id="selectPersonArchivesVo">
+        select patient_id, patient_name, patient_sex, patient_birthday, patient_idcard, patient_hr, patient_address, patient_nation, patient_phone, patient_create_date, deleted from t_medical_cost_person_archives
+    </sql>
+
+    <select id="selectPersonArchivesList" parameterType="PersonArchives" resultMap="PersonArchivesResult">
+        <include refid="selectPersonArchivesVo"/>
+        <where>  
+            <if test="patientName != null  and patientName != ''"> and patient_name like concat('%', #{patientName}, '%')</if>
+            <if test="patientSex != null  and patientSex != ''"> and patient_sex like concat('%', #{patientSex}, '%')</if>
+            <if test="patientIdcard != null  and patientIdcard != ''"> and patient_idcard like concat('%', #{patientIdcard}, '%')</if>
+            <if test="patientHr != null  and patientHr != ''"> and patient_hr like concat('%', #{patientHr},'%')</if>
+            <if test="patientAddress != null  and patientAddress != ''"> and patient_address like concat('%', #{patientAddress}, '%')</if>
+            <if test="patientPhone != null  and patientPhone != ''"> and patient_phonelike concat('%', #{patientPhonelike}, '%')</if>
+            <if test="patientCreateDate != null "> and patient_create_date like concat('%', #{patientCreateDate}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectPersonArchivesByPatientId" parameterType="String" resultMap="PersonArchivesResult">
+        <include refid="selectPersonArchivesVo"/>
+        where patient_id = #{patientId}
+    </select>
+        
+    <insert id="insertPersonArchives" parameterType="PersonArchives">
+        insert into t_medical_cost_person_archives
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="patientId != null">patient_id,</if>
+            <if test="patientName != null and patientName != ''">patient_name,</if>
+            <if test="patientSex != null and patientSex != ''">patient_sex,</if>
+            <if test="patientBirthday != null">patient_birthday,</if>
+            <if test="patientIdcard != null and patientIdcard != ''">patient_idcard,</if>
+            <if test="patientHr != null">patient_hr,</if>
+            <if test="patientAddress != null">patient_address,</if>
+            <if test="patientNation != null">patient_nation,</if>
+            <if test="patientPhone != null and patientPhone != ''">patient_phone,</if>
+            <if test="patientCreateDate != null">patient_create_date,</if>
+            <if test="deleted != null">deleted,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="patientId != null">#{patientId},</if>
+            <if test="patientName != null and patientName != ''">#{patientName},</if>
+            <if test="patientSex != null and patientSex != ''">#{patientSex},</if>
+            <if test="patientBirthday != null">#{patientBirthday},</if>
+            <if test="patientIdcard != null and patientIdcard != ''">#{patientIdcard},</if>
+            <if test="patientHr != null">#{patientHr},</if>
+            <if test="patientAddress != null">#{patientAddress},</if>
+            <if test="patientNation != null">#{patientNation},</if>
+            <if test="patientPhone != null and patientPhone != ''">#{patientPhone},</if>
+            <if test="patientCreateDate != null">#{patientCreateDate},</if>
+            <if test="deleted != null">#{deleted},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePersonArchives" parameterType="PersonArchives">
+        update t_medical_cost_person_archives
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="patientName != null and patientName != ''">patient_name = #{patientName},</if>
+            <if test="patientSex != null and patientSex != ''">patient_sex = #{patientSex},</if>
+            <if test="patientBirthday != null">patient_birthday = #{patientBirthday},</if>
+            <if test="patientIdcard != null and patientIdcard != ''">patient_idcard = #{patientIdcard},</if>
+            <if test="patientHr != null">patient_hr = #{patientHr},</if>
+            <if test="patientAddress != null">patient_address = #{patientAddress},</if>
+            <if test="patientNation != null">patient_nation = #{patientNation},</if>
+            <if test="patientPhone != null and patientPhone != ''">patient_phone = #{patientPhone},</if>
+            <if test="patientCreateDate != null">patient_create_date = #{patientCreateDate},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+        </trim>
+        where patient_id = #{patientId}
+    </update>
+
+    <delete id="deletePersonArchivesByPatientId" parameterType="String">
+        delete from t_medical_cost_person_archives where patient_id = #{patientId}
+    </delete>
+
+    <delete id="deletePersonArchivesByPatientIds" parameterType="String">
+        delete from t_medical_cost_person_archives where patient_id in 
+        <foreach item="patientId" collection="array" open="(" separator="," close=")">
+            #{patientId}
+        </foreach>
+    </delete>
+</mapper>

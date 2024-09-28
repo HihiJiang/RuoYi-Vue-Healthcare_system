@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.CostOutpatientRechargeRecordMapper">
+    
+    <resultMap type="CostOutpatientRechargeRecord" id="CostOutpatientRechargeRecordResult">
+        <result property="rechargeId"    column="recharge_id"    />
+        <result property="rechargeAmount"    column="recharge_amount"    />
+        <result property="rechargeType"    column="recharge_type"    />
+        <result property="rechargeCreatedate"    column="recharge_createdate"    />
+        <result property="outpatientId"    column="outpatient_id"    />
+        <result property="operatorId"    column="operator_id"    />
+    </resultMap>
+
+    <sql id="selectCostOutpatientRechargeRecordVo">
+        select recharge_id, recharge_amount, recharge_type, recharge_createdate, outpatient_id, operator_id from t_medical_cost_outpatient_recharge_record
+    </sql>
+
+    <select id="selectCostOutpatientRechargeRecordList" parameterType="CostOutpatientRechargeRecord" resultMap="CostOutpatientRechargeRecordResult">
+        <include refid="selectCostOutpatientRechargeRecordVo"/>
+        <where>  
+            <if test="rechargeAmount != null "> and recharge_amount = #{rechargeAmount}</if>
+            <if test="rechargeType != null  and rechargeType != ''"> and recharge_type = #{rechargeType}</if>
+            <if test="rechargeCreatedate != null "> and recharge_createdate = #{rechargeCreatedate}</if>
+            <if test="outpatientId != null  and outpatientId != ''"> and outpatient_id = #{outpatientId}</if>
+            <if test="operatorId != null "> and operator_id = #{operatorId}</if>
+        </where>
+    </select>
+    
+    <select id="selectCostOutpatientRechargeRecordByRechargeId" parameterType="Long" resultMap="CostOutpatientRechargeRecordResult">
+        <include refid="selectCostOutpatientRechargeRecordVo"/>
+        where recharge_id = #{rechargeId}
+    </select>
+        
+    <insert id="insertCostOutpatientRechargeRecord" parameterType="CostOutpatientRechargeRecord" useGeneratedKeys="true" keyProperty="rechargeId">
+        insert into t_medical_cost_outpatient_recharge_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="rechargeAmount != null">recharge_amount,</if>
+            <if test="rechargeType != null">recharge_type,</if>
+            <if test="rechargeCreatedate != null">recharge_createdate,</if>
+            <if test="outpatientId != null">outpatient_id,</if>
+            <if test="operatorId != null">operator_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="rechargeAmount != null">#{rechargeAmount},</if>
+            <if test="rechargeType != null">#{rechargeType},</if>
+            <if test="rechargeCreatedate != null">#{rechargeCreatedate},</if>
+            <if test="outpatientId != null">#{outpatientId},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCostOutpatientRechargeRecord" parameterType="CostOutpatientRechargeRecord">
+        update t_medical_cost_outpatient_recharge_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="rechargeAmount != null">recharge_amount = #{rechargeAmount},</if>
+            <if test="rechargeType != null">recharge_type = #{rechargeType},</if>
+            <if test="rechargeCreatedate != null">recharge_createdate = #{rechargeCreatedate},</if>
+            <if test="outpatientId != null">outpatient_id = #{outpatientId},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+        </trim>
+        where recharge_id = #{rechargeId}
+    </update>
+
+    <delete id="deleteCostOutpatientRechargeRecordByRechargeId" parameterType="Long">
+        delete from t_medical_cost_outpatient_recharge_record where recharge_id = #{rechargeId}
+    </delete>
+
+    <delete id="deleteCostOutpatientRechargeRecordByRechargeIds" parameterType="String">
+        delete from t_medical_cost_outpatient_recharge_record where recharge_id in 
+        <foreach item="rechargeId" collection="array" open="(" separator="," close=")">
+            #{rechargeId}
+        </foreach>
+    </delete>
+</mapper>

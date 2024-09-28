@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.DrugsTotalMapper">
+    
+    <resultMap type="DrugsTotal" id="DrugsTotalResult">
+        <result property="totalId"    column="total_id"    />
+        <result property="outpatientId"    column="outpatient_id"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="pharmacyType"    column="pharmacy_type"    />
+        <result property="totalStatus"    column="total_status"    />
+        <result property="totalGettime"    column="total_gettime"    />
+        <result property="totalCreatetime"    column="total_createtime"    />
+        <result property="operatorId"    column="operator_id"    />
+    </resultMap>
+
+    <sql id="selectDrugsTotalVo">
+        select total_id, outpatient_id, patient_id, pharmacy_type, total_status, total_gettime, total_createtime, operator_id from t_medical_drugs_total
+    </sql>
+
+    <select id="selectDrugsTotalList" parameterType="DrugsTotal" resultMap="DrugsTotalResult">
+        <include refid="selectDrugsTotalVo"/>
+        <where>  
+            <if test="outpatientId != null  and outpatientId != ''"> and outpatient_id = #{outpatientId}</if>
+            <if test="patientId != null  and patientId != ''"> and patient_id = #{patientId}</if>
+            <if test="pharmacyType != null  and pharmacyType != ''"> and pharmacy_type = #{pharmacyType}</if>
+            <if test="totalStatus != null "> and total_status = #{totalStatus}</if>
+            <if test="totalGettime != null "> and total_gettime = #{totalGettime}</if>
+            <if test="totalCreatetime != null "> and total_createtime = #{totalCreatetime}</if>
+            <if test="operatorId != null "> and operator_id = #{operatorId}</if>
+        </where>
+    </select>
+    
+    <select id="selectDrugsTotalByTotalId" parameterType="String" resultMap="DrugsTotalResult">
+        <include refid="selectDrugsTotalVo"/>
+        where total_id = #{totalId}
+    </select>
+        
+    <insert id="insertDrugsTotal" parameterType="DrugsTotal">
+        insert into t_medical_drugs_total
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="totalId != null">total_id,</if>
+            <if test="outpatientId != null">outpatient_id,</if>
+            <if test="patientId != null">patient_id,</if>
+            <if test="pharmacyType != null">pharmacy_type,</if>
+            <if test="totalStatus != null">total_status,</if>
+            <if test="totalGettime != null">total_gettime,</if>
+            <if test="totalCreatetime != null">total_createtime,</if>
+            <if test="operatorId != null">operator_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="totalId != null">#{totalId},</if>
+            <if test="outpatientId != null">#{outpatientId},</if>
+            <if test="patientId != null">#{patientId},</if>
+            <if test="pharmacyType != null">#{pharmacyType},</if>
+            <if test="totalStatus != null">#{totalStatus},</if>
+            <if test="totalGettime != null">#{totalGettime},</if>
+            <if test="totalCreatetime != null">#{totalCreatetime},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDrugsTotal" parameterType="DrugsTotal">
+        update t_medical_drugs_total
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="outpatientId != null">outpatient_id = #{outpatientId},</if>
+            <if test="patientId != null">patient_id = #{patientId},</if>
+            <if test="pharmacyType != null">pharmacy_type = #{pharmacyType},</if>
+            <if test="totalStatus != null">total_status = #{totalStatus},</if>
+            <if test="totalGettime != null">total_gettime = #{totalGettime},</if>
+            <if test="totalCreatetime != null">total_createtime = #{totalCreatetime},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+        </trim>
+        where total_id = #{totalId}
+    </update>
+
+    <delete id="deleteDrugsTotalByTotalId" parameterType="String">
+        delete from t_medical_drugs_total where total_id = #{totalId}
+    </delete>
+
+    <delete id="deleteDrugsTotalByTotalIds" parameterType="String">
+        delete from t_medical_drugs_total where total_id in 
+        <foreach item="totalId" collection="array" open="(" separator="," close=")">
+            #{totalId}
+        </foreach>
+    </delete>
+</mapper>

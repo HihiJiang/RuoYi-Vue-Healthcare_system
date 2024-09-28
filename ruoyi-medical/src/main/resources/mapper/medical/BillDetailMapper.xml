@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.BillDetailMapper">
+    
+    <resultMap type="BillDetail" id="BillDetailResult">
+        <result property="billdetailId"    column="billdetail_id"    />
+        <result property="billId"    column="bill_id"    />
+        <result property="billdetailPartname"    column="billdetail_partname"    />
+        <result property="billdetaillPartnumber"    column="billdetaill_partnumber"    />
+        <result property="billdetailPrice"    column="billdetail_price"    />
+    </resultMap>
+
+    <sql id="selectBillDetailVo">
+        select billdetail_id, bill_id, billdetail_partname, billdetaill_partnumber, billdetail_price from t_medical_cost_bill_detail
+    </sql>
+
+    <select id="selectBillDetailList" parameterType="BillDetail" resultMap="BillDetailResult">
+        <include refid="selectBillDetailVo"/>
+        <where>  
+            <if test="billId != null  and billId != ''"> and bill_id = #{billId}</if>
+            <if test="billdetailPartname != null  and billdetailPartname != ''"> and billdetail_partname like concat('%', #{billdetailPartname}, '%')</if>
+            <if test="billdetaillPartnumber != null "> and billdetaill_partnumber = #{billdetaillPartnumber}</if>
+            <if test="billdetailPrice != null "> and billdetail_price = #{billdetailPrice}</if>
+        </where>
+    </select>
+    
+    <select id="selectBillDetailByBilldetailId" parameterType="Long" resultMap="BillDetailResult">
+        <include refid="selectBillDetailVo"/>
+        where billdetail_id = #{billdetailId}
+    </select>
+        
+    <insert id="insertBillDetail" parameterType="BillDetail" useGeneratedKeys="true" keyProperty="billdetailId">
+        insert into t_medical_cost_bill_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="billId != null">bill_id,</if>
+            <if test="billdetailPartname != null">billdetail_partname,</if>
+            <if test="billdetaillPartnumber != null">billdetaill_partnumber,</if>
+            <if test="billdetailPrice != null">billdetail_price,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="billId != null">#{billId},</if>
+            <if test="billdetailPartname != null">#{billdetailPartname},</if>
+            <if test="billdetaillPartnumber != null">#{billdetaillPartnumber},</if>
+            <if test="billdetailPrice != null">#{billdetailPrice},</if>
+         </trim>
+    </insert>
+    <insert id="addCostBillDetailBatch">
+        insert into t_medical_cost_bill_detail(bill_id,billdetail_partname,billdetaill_partnumber,billdetail_price)
+        values 
+            <foreach collection="lst" item="it" separator=",">
+                (#{it.billId},#{it.billdetailPartname},#{it.billdetaillPartnumber},#{it.billdetailPrice})
+            </foreach>
+    </insert>
+
+    <update id="updateBillDetail" parameterType="BillDetail">
+        update t_medical_cost_bill_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="billId != null">bill_id = #{billId},</if>
+            <if test="billdetailPartname != null">billdetail_partname = #{billdetailPartname},</if>
+            <if test="billdetaillPartnumber != null">billdetaill_partnumber = #{billdetaillPartnumber},</if>
+            <if test="billdetailPrice != null">billdetail_price = #{billdetailPrice},</if>
+        </trim>
+        where billdetail_id = #{billdetailId}
+    </update>
+
+    <delete id="deleteBillDetailByBilldetailId" parameterType="Long">
+        delete from t_medical_cost_bill_detail where billdetail_id = #{billdetailId}
+    </delete>
+
+    <delete id="deleteBillDetailByBilldetailIds" parameterType="String">
+        delete from t_medical_cost_bill_detail where billdetail_id in 
+        <foreach item="billdetailId" collection="array" open="(" separator="," close=")">
+            #{billdetailId}
+        </foreach>
+    </delete>
+</mapper>

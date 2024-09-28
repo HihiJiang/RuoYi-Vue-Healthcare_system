@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.CostBillMapper">
+    
+    <resultMap type="CostBill" id="CostBillResult">
+        <result property="billId"    column="bill_id"    />
+        <result property="billAmount"    column="bill_amount"    />
+        <result property="billCreatedate"    column="bill_createdate"    />
+        <result property="billRemark"    column="bill_remark"    />
+        <result property="outpatientId"    column="outpatient_id"    />
+    </resultMap>
+
+    <sql id="selectCostBillVo">
+        select bill_id, bill_amount, bill_createdate, bill_remark, outpatient_id from t_medical_cost_bill
+    </sql>
+
+    <select id="selectCostBillList" parameterType="com.ruoyi.medical.dto.CostBillDto" resultType="com.ruoyi.medical.vo.CostBillVo">
+        select
+            bill.*,arc.patient_name,arc.patient_idcard
+        from
+            t_medical_cost_bill as bill
+        inner JOIN t_medical_cost_outpatient_info as info
+            on bill.outpatient_id = info.outpatient_id
+        inner join t_medical_cost_person_archives as arc
+            on info.patient_id = arc.patient_id
+        <where>
+            <if test="patientName != null and patientName != ''"> and arc.patient_name like concat('%',#{patientName},'%') </if>
+         <if test="billCreatedate != null"> and bill.bill_createdate like concat('%',#{billCreatedate},'%') </if>
+        </where>
+        order by bill.bill_createdate desc
+    </select>
+    
+    <select id="selectCostBillByBillId" parameterType="String" resultMap="CostBillResult">
+        <include refid="selectCostBillVo"/>
+        where bill_id = #{billId}
+    </select>
+        
+    <insert id="insertCostBill" parameterType="CostBill">
+        insert into t_medical_cost_bill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="billId != null">bill_id,</if>
+            <if test="billAmount != null">bill_amount,</if>
+            <if test="billCreatedate != null">bill_createdate,</if>
+            <if test="billRemark != null">bill_remark,</if>
+            <if test="outpatientId != null">outpatient_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="billId != null">#{billId},</if>
+            <if test="billAmount != null">#{billAmount},</if>
+            <if test="billCreatedate != null">#{billCreatedate},</if>
+            <if test="billRemark != null">#{billRemark},</if>
+            <if test="outpatientId != null">#{outpatientId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCostBill" parameterType="CostBill">
+        update t_medical_cost_bill
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="billAmount != null">bill_amount = #{billAmount},</if>
+            <if test="billCreatedate != null">bill_createdate = #{billCreatedate},</if>
+            <if test="billRemark != null">bill_remark = #{billRemark},</if>
+            <if test="outpatientId != null">outpatient_id = #{outpatientId},</if>
+        </trim>
+        where bill_id = #{billId}
+    </update>
+
+    <delete id="deleteCostBillByBillId" parameterType="String">
+        delete from t_medical_cost_bill where bill_id = #{billId}
+    </delete>
+
+    <delete id="deleteCostBillByBillIds" parameterType="String">
+        delete from t_medical_cost_bill where bill_id in 
+        <foreach item="billId" collection="array" open="(" separator="," close=")">
+            #{billId}
+        </foreach>
+    </delete>
+</mapper>

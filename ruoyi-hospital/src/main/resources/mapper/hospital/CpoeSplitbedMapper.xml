@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.hospital.mapper.CpoeSplitbedMapper">
+    
+    <resultMap type="CpoeSplitbed" id="CpoeSplitbedResult">
+        <result property="splitbedId"    column="splitbed_id"    />
+        <result property="recordsId"    column="records_id"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="doctorId"    column="doctor_id"    />
+        <result property="bedId"    column="bed_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="splitbedStatus"    column="splitbed_status"    />
+        <result property="splitbedCreatedate"    column="splitbed_createdate"    />
+        <result property="splitbedIndate"    column="splitbed_indate"    />
+        <result property="splitbedOutdate"    column="splitbed_outdate"    />
+        <result property="splitbedRemark"    column="splitbed_remark"    />
+    </resultMap>
+
+    <sql id="selectCpoeSplitbedVo">
+        select splitbed_id, records_id, patient_id, doctor_id, bed_id, dept_id, splitbed_status, splitbed_createdate, splitbed_indate, splitbed_outdate, splitbed_remark
+        from t_medical_cpoe_splitbed
+    </sql>
+
+    <select id="selectCpoeSplitbedList" parameterType="com.ruoyi.hospital.DTO.CpoeSplitbedDTO" resultType="com.ruoyi.hospital.Vo.CpoeSplitbedVo">
+        select
+        spl.*,rom.room_name as rm_name,bed.bed_name as bed_name,u.user_id as u_id,
+        u.nick_name as doctor_name,arc.patient_name as ph_name,arc.patient_idcard
+        from
+            t_medical_cpoe_splitbed as spl
+        left join
+            t_medical_cost_person_archives arc
+        on spl.patient_id = arc.patient_id
+        left join
+            t_medical_cpoe_bed as bed
+        on spl.bed_id = bed.bed_id
+        left join
+            t_medical_cpoe_sickroom as rom
+        on bed.room_id = rom.room_id
+        left join
+            sys_user as u
+        on spl.doctor_id = u.user_id
+        left join
+            sys_user_post as up
+        on u.user_id = up.user_id
+        left join
+            sys_post as p
+        on up.post_id = p.post_id
+        left join
+            sys_user_role as ur
+        on u.user_id = ur.user_id
+        left join
+            sys_role as r
+        on r.role_id = ur.role_id
+
+        <where>
+            <if test="rmName != null  and rmName != ''"> and rom.room_name like concat('%', #{rmName}, '%')</if>
+            <if test="bedName != null  and bedName != ''"> and bed.bed_name like concat('%', #{bedName}, '%')</if>
+            <if test="doctorName != null  and doctorName != ''"> and u.nick_name like concat('%', #{doctorName}, '%')</if>
+            <if test="patientIdcard != null  and patientIdcard != ''"> and arc.patient_idcard like concat('%', #{patientIdcard}, '%')</if>
+            <if test="phName != null  and phName != ''"> and arc.patient_name like concat('%', #{phName}, '%')</if>
+            <if test="splitbedStatus != null  and splitbedStatus != ''"> and spl.splitbed_status = #{splitbedStatus}</if>
+            <if test="deptId != null  and deptId != ''"> and spl.dept_id = #{deptId}</if>
+        </where>
+    </select>
+    
+    <select id="selectCpoeSplitbedBySplitbedId" parameterType="Long" resultMap="CpoeSplitbedResult">
+        <include refid="selectCpoeSplitbedVo"/>
+        where splitbed_id = #{splitbedId}
+    </select>
+        
+    <insert id="insertCpoeSplitbed" parameterType="CpoeSplitbed" useGeneratedKeys="true" keyProperty="splitbedId">
+        insert into t_medical_cpoe_splitbed
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recordsId != null">records_id,</if>
+            <if test="patientId != null">patient_id,</if>
+            <if test="doctorId != null">doctor_id,</if>
+            <if test="bedId != null">bed_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="splitbedStatus != null">splitbed_status,</if>
+            <if test="splitbedCreatedate != null">splitbed_createdate,</if>
+            <if test="splitbedIndate != null">splitbed_indate,</if>
+            <if test="splitbedOutdate != null">splitbed_outdate,</if>
+            <if test="splitbedRemark != null">splitbed_remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="recordsId != null">#{recordsId},</if>
+            <if test="patientId != null">#{patientId},</if>
+            <if test="doctorId != null">#{doctorId},</if>
+            <if test="bedId != null">#{bedId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="splitbedStatus != null">#{splitbedStatus},</if>
+            <if test="splitbedCreatedate != null">#{splitbedCreatedate},</if>
+            <if test="splitbedIndate != null">#{splitbedIndate},</if>
+            <if test="splitbedOutdate != null">#{splitbedOutdate},</if>
+            <if test="splitbedRemark != null">#{splitbedRemark},</if>
+         </trim>
+    </insert>
+
+<!--    <if test="recordsId != null">records_id = #{recordsId},</if>-->
+<!--    <if test="patientId != null">patient_id = #{patientId},</if>-->
+<!--    <if test="splitbedCreatedate != null">splitbed_createdate = #{splitbedCreatedate},</if>-->
+    <update id="updateCpoeSplitbed" parameterType="CpoeSplitbed">
+        update t_medical_cpoe_splitbed
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="doctorId != null">doctor_id = #{doctorId},</if>
+            <if test="bedId != null">bed_id = #{bedId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="splitbedStatus != null">splitbed_status = #{splitbedStatus},</if>
+            <if test="splitbedIndate != null">splitbed_indate = #{splitbedIndate},</if>
+            <if test="splitbedOutdate != null">splitbed_outdate = #{splitbedOutdate},</if>
+            <if test="splitbedRemark != null">splitbed_remark = #{splitbedRemark},</if>
+        </trim>
+        <where>
+            <if test="splitbedId != null and splitbedId != ''">and splitbed_id = #{splitbedId}</if>
+            <if test="patientId != null and patientId != ''">and patient_id = #{patientId}</if>
+        </where>
+    </update>
+
+    <delete id="deleteCpoeSplitbedBySplitbedId" parameterType="Long">
+        delete from t_medical_cpoe_splitbed where splitbed_id = #{splitbedId}
+    </delete>
+
+    <delete id="deleteCpoeSplitbedBySplitbedIds" parameterType="String">
+        delete from t_medical_cpoe_splitbed where splitbed_id in 
+        <foreach item="splitbedId" collection="array" open="(" separator="," close=")">
+            #{splitbedId}
+        </foreach>
+    </delete>
+</mapper>

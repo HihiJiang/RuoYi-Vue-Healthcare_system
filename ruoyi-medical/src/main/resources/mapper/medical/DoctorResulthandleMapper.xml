@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.DoctorResulthandleMapper">
+    
+    <resultMap type="DoctorResulthandle" id="DoctorResulthandleResult">
+        <result property="treatId"    column="treat_id"    />
+        <result property="treatPartname"    column="treat_partname"    />
+        <result property="treatPartnumber"    column="treat_partnumber"    />
+        <result property="treatPartmoney"    column="treat_partmoney"    />
+        <result property="treatCreatedate"    column="treat_createdate"    />
+        <result property="recordsId"    column="records_id"    />
+    </resultMap>
+
+    <sql id="selectDoctorResulthandleVo">
+        select treat_id, treat_partname, treat_partnumber, treat_partmoney, treat_createdate, records_id from t_medical_outpatientdoctor_resulthandle
+    </sql>
+
+    <select id="selectDoctorResulthandleList" parameterType="DoctorResulthandle" resultMap="DoctorResulthandleResult">
+        <include refid="selectDoctorResulthandleVo"/>
+        <where>  
+            <if test="treatPartname != null  and treatPartname != ''"> and treat_partname like concat('%', #{treatPartname}, '%')</if>
+            <if test="treatPartnumber != null "> and treat_partnumber = #{treatPartnumber}</if>
+            <if test="treatPartmoney != null "> and treat_partmoney = #{treatPartmoney}</if>
+            <if test="treatCreatedate != null "> and treat_createdate = #{treatCreatedate}</if>
+            <if test="recordsId != null  and recordsId != ''"> and records_id = #{recordsId}</if>
+        </where>
+    </select>
+    
+    <select id="selectDoctorResulthandleByTreatId" parameterType="Long" resultMap="DoctorResulthandleResult">
+        <include refid="selectDoctorResulthandleVo"/>
+        where treat_id = #{treatId}
+    </select>
+        
+    <insert id="insertDoctorResulthandle" parameterType="DoctorResulthandle" useGeneratedKeys="true" keyProperty="treatId">
+        insert into t_medical_outpatientdoctor_resulthandle
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="treatPartname != null">treat_partname,</if>
+            <if test="treatPartnumber != null">treat_partnumber,</if>
+            <if test="treatPartmoney != null">treat_partmoney,</if>
+            <if test="treatCreatedate != null">treat_createdate,</if>
+            <if test="recordsId != null">records_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="treatPartname != null">#{treatPartname},</if>
+            <if test="treatPartnumber != null">#{treatPartnumber},</if>
+            <if test="treatPartmoney != null">#{treatPartmoney},</if>
+            <if test="treatCreatedate != null">#{treatCreatedate},</if>
+            <if test="recordsId != null">#{recordsId},</if>
+         </trim>
+    </insert>
+    <insert id="addResulthandleBatch">
+        insert into t_medical_outpatientdoctor_resulthandle
+        (treat_partname,treat_partnumber,treat_partmoney,records_id)
+        values
+            <foreach collection="lst" item="it" separator=",">
+                (#{it.treatPartname},#{it.treatPartnumber},#{it.treatPartmoney},#{it.recordsId})
+            </foreach>
+    </insert>
+
+    <update id="updateDoctorResulthandle" parameterType="DoctorResulthandle">
+        update t_medical_outpatientdoctor_resulthandle
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="treatPartname != null">treat_partname = #{treatPartname},</if>
+            <if test="treatPartnumber != null">treat_partnumber = #{treatPartnumber},</if>
+            <if test="treatPartmoney != null">treat_partmoney = #{treatPartmoney},</if>
+            <if test="treatCreatedate != null">treat_createdate = #{treatCreatedate},</if>
+            <if test="recordsId != null">records_id = #{recordsId},</if>
+        </trim>
+        where treat_id = #{treatId}
+    </update>
+
+    <delete id="deleteDoctorResulthandleByTreatId" parameterType="Long">
+        delete from t_medical_outpatientdoctor_resulthandle where treat_id = #{treatId}
+    </delete>
+
+    <delete id="deleteDoctorResulthandleByTreatIds" parameterType="String">
+        delete from t_medical_outpatientdoctor_resulthandle where treat_id in 
+        <foreach item="treatId" collection="array" open="(" separator="," close=")">
+            #{treatId}
+        </foreach>
+    </delete>
+</mapper>

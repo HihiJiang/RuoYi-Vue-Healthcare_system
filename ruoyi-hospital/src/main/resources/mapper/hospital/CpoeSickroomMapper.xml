@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.hospital.mapper.CpoeSickroomMapper">
+    
+    <resultMap type="CpoeSickroom" id="CpoeSickroomResult">
+        <result property="roomId"    column="room_id"    />
+        <result property="roomName"    column="room_name"    />
+        <result property="roomSize"    column="room_size"    />
+        <result property="roomNum"    column="room_num"    />
+        <result property="roomDept"    column="room_dept"    />
+        <result property="roomAddr"    column="room_addr"    />
+        <result property="roomRemark"    column="room_remark"    />
+    </resultMap>
+
+    <sql id="selectCpoeSickroomVo">
+        select room_id, room_name, room_size, room_num, room_dept, room_addr, room_remark from t_medical_cpoe_sickroom
+    </sql>
+
+    <select id="selectCpoeSickroomList" parameterType="com.ruoyi.hospital.DTO.CpoeSickroomDTO" resultType="com.ruoyi.hospital.Vo.CpoeSickroomVo">
+        select rom.*,bednum.count_num,bednum.null_num from t_medical_cpoe_sickroom as rom,(select room_id as numromid,sum(if(bed_status = '0',1,0)) as null_num ,sum(if(bed_status = '1',1,0)) as count_num from t_medical_cpoe_bed GROUP BY room_id) bednum
+        <where>
+            rom.room_id = bednum.numromid
+            <if test="roomId != null  and roomId != ''"> and rom.room_id = #{roomId}</if>
+            <if test="bedStatus != null  and bedStatus != ''"> and bednum.bed_status = #{bedStatus}</if>
+            <if test="roomName != null  and roomName != ''"> and room_name like concat('%', #{roomName}, '%')</if>
+            <if test="roomSize != null  and roomSize != ''"> and room_size like concat('%', #{roomSize}, '%')</if>
+            <if test="roomNum != null "> and room_num = #{roomNum}</if>
+            <if test="roomDept != null  and roomDept != ''"> and room_dept like concat('%', #{roomDept}, '%')</if>
+            <if test="roomAddr != null  and roomAddr != ''"> and room_addr like concat('%', #{roomAddr}, '%')</if>
+            <if test="roomRemark != null  and roomRemark != ''"> and room_remark like concat('%', #{roomRemark}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectCpoeSickroomByRoomId" parameterType="Long" resultMap="CpoeSickroomResult">
+        <include refid="selectCpoeSickroomVo"/>
+        where room_id = #{roomId}
+    </select>
+        
+    <insert id="insertCpoeSickroom" parameterType="CpoeSickroom" useGeneratedKeys="true" keyProperty="roomId">
+        insert into t_medical_cpoe_sickroom
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roomName != null">room_name,</if>
+            <if test="roomSize != null">room_size,</if>
+            <if test="roomNum != null">room_num,</if>
+            <if test="roomDept != null">room_dept,</if>
+            <if test="roomAddr != null">room_addr,</if>
+            <if test="roomRemark != null">room_remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roomName != null">#{roomName},</if>
+            <if test="roomSize != null">#{roomSize},</if>
+            <if test="roomNum != null">#{roomNum},</if>
+            <if test="roomDept != null">#{roomDept},</if>
+            <if test="roomAddr != null">#{roomAddr},</if>
+            <if test="roomRemark != null">#{roomRemark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCpoeSickroom" parameterType="CpoeSickroom">
+        update t_medical_cpoe_sickroom
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="roomName != null">room_name = #{roomName},</if>
+            <if test="roomSize != null">room_size = #{roomSize},</if>
+            <if test="roomNum != null">room_num = #{roomNum},</if>
+            <if test="roomDept != null">room_dept = #{roomDept},</if>
+            <if test="roomAddr != null">room_addr = #{roomAddr},</if>
+            <if test="roomRemark != null">room_remark = #{roomRemark},</if>
+        </trim>
+        where room_id = #{roomId}
+    </update>
+
+    <delete id="deleteCpoeSickroomByRoomId" parameterType="Long">
+        delete from t_medical_cpoe_sickroom where room_id = #{roomId}
+    </delete>
+
+    <delete id="deleteCpoeSickroomByRoomIds" parameterType="String">
+        delete from t_medical_cpoe_sickroom where room_id in 
+        <foreach item="roomId" collection="array" open="(" separator="," close=")">
+            #{roomId}
+        </foreach>
+    </delete>
+</mapper>

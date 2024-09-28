@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.ServiceTypeMapper">
+    
+    <resultMap type="ServiceType" id="ServiceTypeResult">
+        <result property="servicetypeId"    column="servicetype_id"    />
+        <result property="servicetypePid"    column="servicetype_pid"    />
+        <result property="servicetypeName"    column="servicetype_name"    />
+        <result property="servicetypeDetails"    column="servicetype_details"    />
+    </resultMap>
+
+    <sql id="selectServiceTypeVo">
+        select servicetype_id, servicetype_pid, servicetype_name, servicetype_details from t_medical_service_type
+    </sql>
+
+    <select id="selectServiceTypeList" parameterType="ServiceType" resultMap="ServiceTypeResult">
+        <include refid="selectServiceTypeVo"/>
+        <where>  
+            <if test="servicetypeId != null "> and servicetype_pid = #{servicetypeId}</if>
+            <if test="servicetypeName != null  and servicetypeName != ''"> and servicetype_name like concat('%', #{servicetypeName}, '%')</if>
+            <if test="servicetypeDetails != null  and servicetypeDetails != ''"> and servicetype_details = #{servicetypeDetails}</if>
+        </where>
+    </select>
+    
+    <select id="selectServiceTypeByServicetypeId" parameterType="String" resultMap="ServiceTypeResult">
+        <include refid="selectServiceTypeVo"/>
+        where servicetype_id = #{servicetypeId}
+    </select>
+        
+    <insert id="insertServiceType" parameterType="ServiceType">
+        insert into t_medical_service_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="servicetypeId != null">servicetype_id,</if>
+            <if test="servicetypePid != null">servicetype_pid,</if>
+            <if test="servicetypeName != null">servicetype_name,</if>
+            <if test="servicetypeDetails != null">servicetype_details,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="servicetypeId != null">#{servicetypeId},</if>
+            <if test="servicetypePid != null">#{servicetypePid},</if>
+            <if test="servicetypeName != null">#{servicetypeName},</if>
+            <if test="servicetypeDetails != null">#{servicetypeDetails},</if>
+         </trim>
+    </insert>
+
+    <update id="updateServiceType" parameterType="ServiceType">
+        update t_medical_service_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="servicetypePid != null">servicetype_pid = #{servicetypePid},</if>
+            <if test="servicetypeName != null">servicetype_name = #{servicetypeName},</if>
+            <if test="servicetypeDetails != null">servicetype_details = #{servicetypeDetails},</if>
+        </trim>
+        where servicetype_id = #{servicetypeId}
+    </update>
+
+    <delete id="deleteServiceTypeByServicetypeId" parameterType="String">
+        delete from t_medical_service_type where servicetype_id = #{servicetypeId}
+    </delete>
+
+    <delete id="deleteServiceTypeByServicetypeIds" parameterType="String">
+        delete from t_medical_service_type where servicetype_id in 
+        <foreach item="servicetypeId" collection="array" open="(" separator="," close=")">
+            #{servicetypeId}
+        </foreach>
+    </delete>
+</mapper>

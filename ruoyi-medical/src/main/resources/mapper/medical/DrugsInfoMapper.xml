@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.DrugsInfoMapper">
+    
+    <resultMap type="DrugsInfo" id="DrugsInfoResult">
+        <result property="drugsId"    column="drugs_id"    />
+        <result property="drugsName"    column="drugs_name"    />
+        <result property="drugsPinyin"    column="drugs_pinyin"    />
+        <result property="drugsSize"    column="drugs_size"    />
+        <result property="drugsDesc"    column="drugs_desc"    />
+        <result property="drugsFactory"    column="drugs_factory"    />
+        <result property="drugsExpire"    column="drugs_expire"    />
+        <result property="drugsStatus"    column="drugs_status"    />
+        <result property="drugsInpay"    column="drugs_inpay"    />
+        <result property="drugsOutpay"    column="drugs_outpay"    />
+        <result property="drugsCreatetime"    column="drugs_createtime"    />
+        <result property="operatorId"    column="operator_id"    />
+    </resultMap>
+
+    <sql id="selectDrugsInfoVo">
+        select drugs_id, drugs_name, drugs_pinyin, drugs_size, drugs_desc, drugs_factory, drugs_expire, drugs_status, drugs_inpay, drugs_outpay, drugs_createtime, operator_id from t_medical_drugs_info
+    </sql>
+
+    <select id="selectDrugsInfoList" parameterType="DrugsInfo" resultMap="DrugsInfoResult">
+        <include refid="selectDrugsInfoVo"/>
+        <where>
+             drugs_status =1
+            <if test="drugsName != null  and drugsName != ''"> and drugs_name like concat('%', #{drugsName}, '%')</if>
+            <if test="drugsPinyin != null  and drugsPinyin != ''"> and drugs_pinyin like concat(#{drugsPinyin},'%')  </if>
+            <if test="drugsSize != null  and drugsSize != ''"> and drugs_size = #{drugsSize}</if>
+            <if test="drugsDesc != null  and drugsDesc != ''"> and drugs_desc = #{drugsDesc}</if>
+            <if test="drugsFactory != null  and drugsFactory != ''"> and drugs_factory = #{drugsFactory}</if>
+            <if test="drugsExpire != null "> and drugs_expire = #{drugsExpire}</if>
+            <if test="drugsInpay != null "> and drugs_inpay = #{drugsInpay}</if>
+            <if test="drugsOutpay != null "> and drugs_outpay = #{drugsOutpay}</if>
+            <if test="drugsCreatetime != null "> and drugs_createtime = #{drugsCreatetime}</if>
+            <if test="operatorId != null "> and operator_id = #{operatorId}</if>
+        </where>
+    </select>
+    
+    <select id="selectDrugsInfoByDrugsId" parameterType="Long" resultMap="DrugsInfoResult">
+        <include refid="selectDrugsInfoVo"/>
+        where drugs_id = #{drugsId}
+    </select>
+        
+    <insert id="insertDrugsInfo" parameterType="DrugsInfo" useGeneratedKeys="true" keyProperty="drugsId">
+        insert into t_medical_drugs_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="drugsName != null">drugs_name,</if>
+            <if test="drugsPinyin != null">drugs_pinyin,</if>
+            <if test="drugsSize != null">drugs_size,</if>
+            <if test="drugsDesc != null">drugs_desc,</if>
+            <if test="drugsFactory != null">drugs_factory,</if>
+            <if test="drugsExpire != null">drugs_expire,</if>
+            <if test="drugsStatus != null">drugs_status,</if>
+            <if test="drugsInpay != null">drugs_inpay,</if>
+            <if test="drugsOutpay != null">drugs_outpay,</if>
+            <if test="drugsCreatetime != null">drugs_createtime,</if>
+            <if test="operatorId != null">operator_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="drugsName != null">#{drugsName},</if>
+            <if test="drugsPinyin != null">#{drugsPinyin},</if>
+            <if test="drugsSize != null">#{drugsSize},</if>
+            <if test="drugsDesc != null">#{drugsDesc},</if>
+            <if test="drugsFactory != null">#{drugsFactory},</if>
+            <if test="drugsExpire != null">#{drugsExpire},</if>
+            <if test="drugsStatus != null">#{drugsStatus},</if>
+            <if test="drugsInpay != null">#{drugsInpay},</if>
+            <if test="drugsOutpay != null">#{drugsOutpay},</if>
+            <if test="drugsCreatetime != null">#{drugsCreatetime},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDrugsInfo" parameterType="DrugsInfo">
+        update t_medical_drugs_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="drugsName != null">drugs_name = #{drugsName},</if>
+            <if test="drugsPinyin != null">drugs_pinyin = #{drugsPinyin},</if>
+            <if test="drugsSize != null">drugs_size = #{drugsSize},</if>
+            <if test="drugsDesc != null">drugs_desc = #{drugsDesc},</if>
+            <if test="drugsFactory != null">drugs_factory = #{drugsFactory},</if>
+            <if test="drugsExpire != null">drugs_expire = #{drugsExpire},</if>
+            <if test="drugsStatus != null">drugs_status = #{drugsStatus},</if>
+            <if test="drugsInpay != null">drugs_inpay = #{drugsInpay},</if>
+            <if test="drugsOutpay != null">drugs_outpay = #{drugsOutpay},</if>
+            <if test="drugsCreatetime != null">drugs_createtime = #{drugsCreatetime},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+        </trim>
+        where drugs_id = #{drugsId}
+    </update>
+
+    <delete id="deleteDrugsInfoByDrugsId" parameterType="Long">
+        delete from t_medical_drugs_info where drugs_id = #{drugsId}
+    </delete>
+
+    <delete id="deleteDrugsInfoByDrugsIds" parameterType="String">
+        delete from t_medical_drugs_info where drugs_id in 
+        <foreach item="drugsId" collection="array" open="(" separator="," close=")">
+            #{drugsId}
+        </foreach>
+    </delete>
+</mapper>

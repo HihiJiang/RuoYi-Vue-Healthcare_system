@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.DrugsTotalinfoMapper">
+    
+    <resultMap type="DrugsTotalinfo" id="DrugsTotalinfoResult">
+        <result property="totalinfoId"    column="totalinfo_id"    />
+        <result property="totalId"    column="total_id"    />
+        <result property="drugsId"    column="drugs_id"    />
+        <result property="totalNo"    column="total_no"    />
+    </resultMap>
+
+    <sql id="selectDrugsTotalinfoVo">
+        select totalinfo_id, total_id, drugs_id, total_no from t_medical_drugs_totalinfo
+    </sql>
+
+    <select id="selectDrugsTotalinfoList" parameterType="DrugsTotalinfo" resultMap="DrugsTotalinfoResult">
+        <include refid="selectDrugsTotalinfoVo"/>
+        <where>  
+            <if test="totalId != null  and totalId != ''"> and total_id = #{totalId}</if>
+            <if test="drugsId != null  and drugsId != ''"> and drugs_id = #{drugsId}</if>
+            <if test="totalNo != null "> and total_no = #{totalNo}</if>
+        </where>
+    </select>
+    
+    <select id="selectDrugsTotalinfoByTotalinfoId" parameterType="Long" resultMap="DrugsTotalinfoResult">
+        <include refid="selectDrugsTotalinfoVo"/>
+        where totalinfo_id = #{totalinfoId}
+    </select>
+        
+    <insert id="insertDrugsTotalinfo" parameterType="DrugsTotalinfo" useGeneratedKeys="true" keyProperty="totalinfoId">
+        insert into t_medical_drugs_totalinfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="totalId != null">total_id,</if>
+            <if test="drugsId != null">drugs_id,</if>
+            <if test="totalNo != null">total_no,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="totalId != null">#{totalId},</if>
+            <if test="drugsId != null">#{drugsId},</if>
+            <if test="totalNo != null">#{totalNo},</if>
+         </trim>
+    </insert>
+    <insert id="addDrugsTotalInfoBatch">
+        insert into t_medical_drugs_totalinfo
+            (total_id,drugs_id,total_no)
+        values
+            <foreach collection="lst" item="it" separator=",">
+                (#{it.totalId},#{it.drugsId},#{it.totalNo})
+            </foreach>
+     </insert>
+
+    <update id="updateDrugsTotalinfo" parameterType="DrugsTotalinfo">
+        update t_medical_drugs_totalinfo
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="totalId != null">total_id = #{totalId},</if>
+            <if test="drugsId != null">drugs_id = #{drugsId},</if>
+            <if test="totalNo != null">total_no = #{totalNo},</if>
+        </trim>
+        where totalinfo_id = #{totalinfoId}
+    </update>
+
+    <delete id="deleteDrugsTotalinfoByTotalinfoId" parameterType="Long">
+        delete from t_medical_drugs_totalinfo where totalinfo_id = #{totalinfoId}
+    </delete>
+
+    <delete id="deleteDrugsTotalinfoByTotalinfoIds" parameterType="String">
+        delete from t_medical_drugs_totalinfo where totalinfo_id in 
+        <foreach item="totalinfoId" collection="array" open="(" separator="," close=")">
+            #{totalinfoId}
+        </foreach>
+    </delete>
+</mapper>

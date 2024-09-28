@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.hospital.mapper.PrescriptionMapper">
+    
+    <resultMap type="Prescription" id="PrescriptionResult">
+        <result property="presId"    column="pres_id"    />
+        <result property="ordersId"    column="orders_id"    />
+        <result property="presPartname"    column="pres_partname"    />
+        <result property="presPartnumber"    column="pres_partnumber"    />
+        <result property="presType"    column="pres_type"    />
+        <result property="presCreatetime"    column="pres_createtime"    />
+        <result property="presRemark"    column="pres_remark"    />
+        <result property="operatorId"    column="operator_id"    />
+    </resultMap>
+
+    <sql id="selectPrescriptionVo">
+        select pres_id, orders_id, pres_partname, pres_partnumber, pres_type, pres_createtime, pres_remark, operator_id from t_medical_cpoe_prescription
+    </sql>
+
+    <select id="selectPrescriptionList" parameterType="Prescription" resultMap="PrescriptionResult">
+        <include refid="selectPrescriptionVo"/>
+        <where>  
+            <if test="ordersId != null "> and orders_id = #{ordersId}</if>
+            <if test="presPartname != null  and presPartname != ''"> and pres_partname like concat('%', #{presPartname}, '%')</if>
+            <if test="presPartnumber != null "> and pres_partnumber = #{presPartnumber}</if>
+            <if test="presType != null "> and pres_type = #{presType}</if>
+            <if test="presCreatetime != null "> and pres_createtime like concat('%', #{presCreatetime}, '%')</if>
+            <if test="presRemark != null  and presRemark != ''"> and pres_remark like concat('%', #{presRemark}, '%')</if>
+            <if test="operatorId != null "> and operator_id = #{operatorId}</if>
+        </where>
+    </select>
+    
+    <select id="selectPrescriptionByPresId" parameterType="Long" resultMap="PrescriptionResult">
+        <include refid="selectPrescriptionVo"/>
+        where pres_id = #{presId}
+    </select>
+        
+    <insert id="insertPrescription" parameterType="Prescription" useGeneratedKeys="true" keyProperty="presId">
+        insert into t_medical_cpoe_prescription
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ordersId != null">orders_id,</if>
+            <if test="presPartname != null">pres_partname,</if>
+            <if test="presPartnumber != null">pres_partnumber,</if>
+            <if test="presType != null">pres_type,</if>
+            <if test="presCreatetime != null">pres_createtime,</if>
+            <if test="presRemark != null">pres_remark,</if>
+            <if test="operatorId != null">operator_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ordersId != null">#{ordersId},</if>
+            <if test="presPartname != null">#{presPartname},</if>
+            <if test="presPartnumber != null">#{presPartnumber},</if>
+            <if test="presType != null">#{presType},</if>
+            <if test="presCreatetime != null">#{presCreatetime},</if>
+            <if test="presRemark != null">#{presRemark},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePrescription" parameterType="Prescription">
+        update t_medical_cpoe_prescription
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ordersId != null">orders_id = #{ordersId},</if>
+            <if test="presPartname != null">pres_partname = #{presPartname},</if>
+            <if test="presPartnumber != null">pres_partnumber = #{presPartnumber},</if>
+            <if test="presType != null">pres_type = #{presType},</if>
+            <if test="presCreatetime != null">pres_createtime = #{presCreatetime},</if>
+            <if test="presRemark != null">pres_remark = #{presRemark},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+        </trim>
+        where pres_id = #{presId}
+    </update>
+
+    <delete id="deletePrescriptionByPresId" parameterType="Long">
+        delete from t_medical_cpoe_prescription where pres_id = #{presId}
+    </delete>
+
+    <delete id="deletePrescriptionByPresIds" parameterType="String">
+        delete from t_medical_cpoe_prescription where pres_id in 
+        <foreach item="presId" collection="array" open="(" separator="," close=")">
+            #{presId}
+        </foreach>
+    </delete>
+</mapper>

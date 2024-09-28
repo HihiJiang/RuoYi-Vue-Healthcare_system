@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.CostOutpatientcardMapper">
+    
+    <resultMap type="CostOutpatientcard" id="CostOutpatientcardResult">
+        <result property="outpatientId"    column="outpatient_id"    />
+        <result property="outpatientBalance"    column="outpatient_balance"    />
+        <result property="outpatientEnabletime"    column="outpatient_enabletime"    />
+        <result property="outpatientLosstime"    column="outpatient_losstime"    />
+        <result property="outpatientDeadtime"    column="outpatient_deadtime"    />
+        <result property="outpatientReturntime"    column="outpatient_returntime"    />
+        <result property="outpatientStatus"    column="outpatient_status"    />
+        <result property="outpatientDeposit"    column="outpatient_deposit"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="deleted"    column="deleted"    />
+    </resultMap>
+
+    <sql id="selectCostOutpatientcardVo">
+        select outpatient_id, outpatient_balance, outpatient_enabletime, outpatient_losstime, outpatient_deadtime, outpatient_returntime, outpatient_status, outpatient_deposit, patient_id, operator_id, deleted from t_medical_cost_outpatient_info
+    </sql>
+
+    <select id="selectCostOutpatientcardList" parameterType="com.ruoyi.medical.dto.CostOutpatientcardDTO" resultType="com.ruoyi.medical.vo.CostOutpatientcardVo">
+        select
+        info.* ,arc.patient_name
+        from
+        t_medical_cost_outpatient_info info ,t_medical_cost_person_archives arc
+
+        <where>
+            info.patient_id = arc.patient_id
+
+            <if test="outpatientStatus != null  and outpatientStatus != ''"> and info.outpatient_status = #{outpatientStatus}</if>
+
+            <if test="patientName != null  and patientName != ''"> and arc.patient_name like concat('%',#{patientName},'%') </if>
+        </where>
+        order by outpatient_enabletime desc
+    </select>
+    
+    <select id="selectCostOutpatientcardByOutpatientId" parameterType="String" resultMap="CostOutpatientcardResult">
+        <include refid="selectCostOutpatientcardVo"/>
+        where outpatient_id = #{outpatientId}
+    </select>
+    <select id="queryDoctorsByDetptId" resultType="java.util.Map">
+        SELECT
+            u.user_id,
+            u.nick_name,
+            p.post_name,
+            u.phonenumber,
+            p.toll
+        FROM
+            sys_user u,sys_user_post up ,sys_post p , sys_user_role ur,sys_role r
+        where u.user_id = up.user_id and up.post_id =p.post_id
+          and u.user_id =ur.user_id and ur.role_id =r.role_id
+          and r.role_key='common' and u.dept_id=#{deptId}
+    </select>
+
+    <insert id="insertCostOutpatientcard" parameterType="CostOutpatientcard">
+        insert into t_medical_cost_outpatient_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="outpatientId != null">outpatient_id,</if>
+            <if test="outpatientBalance != null">outpatient_balance,</if>
+            <if test="outpatientEnabletime != null">outpatient_enabletime,</if>
+            <if test="outpatientLosstime != null">outpatient_losstime,</if>
+            <if test="outpatientDeadtime != null">outpatient_deadtime,</if>
+            <if test="outpatientReturntime != null">outpatient_returntime,</if>
+            <if test="outpatientStatus != null">outpatient_status,</if>
+            <if test="outpatientDeposit != null">outpatient_deposit,</if>
+            <if test="patientId != null and patientId != ''">patient_id,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="deleted != null">deleted,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="outpatientId != null">#{outpatientId},</if>
+            <if test="outpatientBalance != null">#{outpatientBalance},</if>
+            <if test="outpatientEnabletime != null">#{outpatientEnabletime},</if>
+            <if test="outpatientLosstime != null">#{outpatientLosstime},</if>
+            <if test="outpatientDeadtime != null">#{outpatientDeadtime},</if>
+            <if test="outpatientReturntime != null">#{outpatientReturntime},</if>
+            <if test="outpatientStatus != null">#{outpatientStatus},</if>
+            <if test="outpatientDeposit != null">#{outpatientDeposit},</if>
+            <if test="patientId != null and patientId != ''">#{patientId},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="deleted != null">#{deleted},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCostOutpatientcard" parameterType="CostOutpatientcard">
+        update t_medical_cost_outpatient_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="outpatientBalance != null">outpatient_balance = #{outpatientBalance},</if>
+            <if test="outpatientEnabletime != null">outpatient_enabletime = #{outpatientEnabletime},</if>
+            <if test="outpatientLosstime != null">outpatient_losstime = #{outpatientLosstime},</if>
+            <if test="outpatientDeadtime != null">outpatient_deadtime = #{outpatientDeadtime},</if>
+            <if test="outpatientReturntime != null">outpatient_returntime = #{outpatientReturntime},</if>
+            <if test="outpatientStatus != null">outpatient_status = #{outpatientStatus},</if>
+            <if test="outpatientDeposit != null">outpatient_deposit = #{outpatientDeposit},</if>
+            <if test="patientId != null and patientId != ''">patient_id = #{patientId},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+        </trim>
+        where outpatient_id = #{outpatientId}
+    </update>
+    <update id="updataOutpatientBalanceById">
+        update t_medical_cost_outpatient_info set
+        <if test="rechargeType == 1 ">
+            outpatient_balance = outpatient_balance+#{outpatientMoney}
+        </if>
+        <if test="rechargeType == 2 ">
+            outpatient_balance = outpatient_balance-#{outpatientMoney}
+        </if>
+        where outpatient_id = #{outpatientId}
+    </update>
+
+    <delete id="deleteCostOutpatientcardByOutpatientId" parameterType="String">
+        delete from t_medical_cost_outpatient_info where outpatient_id = #{outpatientId}
+    </delete>
+
+    <delete id="deleteCostOutpatientcardByOutpatientIds" parameterType="String">
+        delete from t_medical_cost_outpatient_info where outpatient_id in 
+        <foreach item="outpatientId" collection="array" open="(" separator="," close=")">
+            #{outpatientId}
+        </foreach>
+    </delete>
+</mapper>

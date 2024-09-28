@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.hospital.mapper.CpoeBedMapper">
+    
+    <resultMap type="CpoeBed" id="CpoeBedResult">
+        <result property="bedId"    column="bed_id"    />
+        <result property="bedName"    column="bed_name"    />
+        <result property="bedFee"    column="bed_fee"    />
+        <result property="bedAirFee"    column="bed_air_fee"    />
+        <result property="bedStatus"    column="bed_status"    />
+        <result property="bedRemark"    column="bed_remark"    />
+        <result property="roomId"    column="room_id"    />
+    </resultMap>
+
+    <sql id="selectCpoeBedVo">
+        select bed_id, bed_name, bed_fee, bed_air_fee, bed_status, bed_remark, room_id from t_medical_cpoe_bed
+    </sql>
+
+    <select id="selectCpoeBedList" parameterType="com.ruoyi.hospital.DTO.CpoeBedDTO" resultType="com.ruoyi.hospital.Vo.CpoeBedVo">
+        select bed.*,rom.room_name ,rom.room_addr,rom.room_dept from t_medical_cpoe_bed as bed,t_medical_cpoe_sickroom as rom
+        <where>
+            bed.room_id = rom.room_id
+            <if test="bedName != null  and bedName != ''"> and bed.bed_name like concat('%', #{bedName}, '%')</if>
+            <if test="bedStatus != null  and bedStatus != ''"> and bed.bed_status like concat('%', #{bedStatus}, '%')</if>
+            <if test="bedRemark != null  and bedRemark != ''"> and bed.bed_remark like concat('%', #{bedRemark}, '%')</if>
+            <if test="roomName != null  and roomName != ''"> and rom.room_name like concat('%', #{roomName}, '%')</if>
+            <if test="roomAddr != null  and roomAddr != ''"> and rom.room_Addr like concat('%', #{roomAddr}, '%')</if>
+            <if test="roomDept != null  and roomDept != ''"> and rom.room_dept like concat('%', #{roomDept}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectCpoeBedByBedId" parameterType="Long" resultMap="CpoeBedResult">
+        <include refid="selectCpoeBedVo"/>
+        where bed_id = #{bedId}
+    </select>
+        
+    <insert id="insertCpoeBed" parameterType="CpoeBed" useGeneratedKeys="true" keyProperty="bedId">
+        insert into t_medical_cpoe_bed
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bedName != null">bed_name,</if>
+            <if test="bedFee != null">bed_fee,</if>
+            <if test="bedAirFee != null">bed_air_fee,</if>
+            <if test="bedStatus != null">bed_status,</if>
+            <if test="bedRemark != null">bed_remark,</if>
+            <if test="roomId != null">room_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bedName != null">#{bedName},</if>
+            <if test="bedFee != null">#{bedFee},</if>
+            <if test="bedAirFee != null">#{bedAirFee},</if>
+            <if test="bedStatus != null">#{bedStatus},</if>
+            <if test="bedRemark != null">#{bedRemark},</if>
+            <if test="roomId != null">#{roomId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCpoeBed" parameterType="CpoeBed">
+        update t_medical_cpoe_bed
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bedName != null">bed_name = #{bedName},</if>
+            <if test="bedFee != null">bed_fee = #{bedFee},</if>
+            <if test="bedAirFee != null">bed_air_fee = #{bedAirFee},</if>
+            <if test="bedStatus != null">bed_status = #{bedStatus},</if>
+            <if test="bedRemark != null">bed_remark = #{bedRemark},</if>
+            <if test="roomId != null">room_id = #{roomId},</if>
+        </trim>
+        where bed_id = #{bedId}
+    </update>
+
+    <delete id="deleteCpoeBedByBedId" parameterType="Long">
+        delete from t_medical_cpoe_bed where bed_id = #{bedId}
+    </delete>
+
+    <delete id="deleteCpoeBedByBedIds" parameterType="String">
+        delete from t_medical_cpoe_bed where bed_id in 
+        <foreach item="bedId" collection="array" open="(" separator="," close=")">
+            #{bedId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.hospital.mapper.PharmacyMapper">
+    
+    <resultMap type="Pharmacy" id="PharmacyResult">
+        <result property="pharmacyId"    column="pharmacy_id"    />
+        <result property="pharmacyType"    column="pharmacy_type"    />
+        <result property="drugsId"    column="drugs_id"    />
+        <result property="pharmacyNo"    column="pharmacy_no"    />
+        <result property="pharmacyUpdatetime"    column="pharmacy_updatetime"    />
+        <result property="operatorId"    column="operator_id"    />
+    </resultMap>
+
+    <sql id="selectPharmacyVo">
+        select pharmacy_id, pharmacy_type, drugs_id, pharmacy_no, pharmacy_updatetime, operator_id from t_medical_drugs_pharmacy
+    </sql>
+
+    <select id="selectPharmacyList" parameterType="com.ruoyi.hospital.DTO.PharmacyDTO" resultType="com.ruoyi.hospital.Vo.PharmacyVo">
+        select pha.*,din.drugs_name,din.drugs_size,din.drugs_outpay from
+        t_medical_drugs_pharmacy as pha
+        left join
+        t_medical_drugs_info as din
+        on pha.drugs_id = din.drugs_id
+        <where>  
+            <if test="pharmacyType != null  and pharmacyType != ''"> and pha.pharmacy_type like concat('%', #{pharmacyType}, '%')</if>
+            <if test="drugsId != null "> and pha.drugs_id like concat('%', #{drugsId}, '%')</if>
+            <if test="pharmacyNo != null "> and pha.pharmacy_no = #{pharmacyNo}</if>
+            <if test="pharmacyUpdatetime != null "> and pha.pharmacy_updatetime like concat('%', #{pharmacyUpdatetime}, '%')</if>
+            <if test="operatorId != null "> and pha.operator_id like concat('%', #{operatorId}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectPharmacyByPharmacyId" parameterType="Long" resultMap="PharmacyResult">
+        <include refid="selectPharmacyVo"/>
+        where pharmacy_id = #{pharmacyId}
+    </select>
+        
+    <insert id="insertPharmacy" parameterType="Pharmacy" useGeneratedKeys="true" keyProperty="pharmacyId">
+        insert into t_medical_drugs_pharmacy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pharmacyType != null">pharmacy_type,</if>
+            <if test="drugsId != null">drugs_id,</if>
+            <if test="pharmacyNo != null">pharmacy_no,</if>
+            <if test="pharmacyUpdatetime != null">pharmacy_updatetime,</if>
+            <if test="operatorId != null">operator_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pharmacyType != null">#{pharmacyType},</if>
+            <if test="drugsId != null">#{drugsId},</if>
+            <if test="pharmacyNo != null">#{pharmacyNo},</if>
+            <if test="pharmacyUpdatetime != null">#{pharmacyUpdatetime},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePharmacy" parameterType="Pharmacy">
+        update t_medical_drugs_pharmacy
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pharmacyType != null">pharmacy_type = #{pharmacyType},</if>
+            <if test="drugsId != null">drugs_id = #{drugsId},</if>
+            <if test="pharmacyNo != null">pharmacy_no = #{pharmacyNo},</if>
+            <if test="pharmacyUpdatetime != null">pharmacy_updatetime = #{pharmacyUpdatetime},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+        </trim>
+        where pharmacy_id = #{pharmacyId}
+    </update>
+
+    <delete id="deletePharmacyByPharmacyId" parameterType="Long">
+        delete from t_medical_drugs_pharmacy where pharmacy_id = #{pharmacyId}
+    </delete>
+
+    <delete id="deletePharmacyByPharmacyIds" parameterType="String">
+        delete from t_medical_drugs_pharmacy where pharmacy_id in 
+        <foreach item="pharmacyId" collection="array" open="(" separator="," close=")">
+            #{pharmacyId}
+        </foreach>
+    </delete>
+</mapper>

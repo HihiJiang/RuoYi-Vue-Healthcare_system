@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.DoctorReceiverecordMapper">
+    
+    <resultMap type="DoctorReceiverecord" id="DoctorReceiverecordResult">
+        <result property="recordsId"    column="records_id"    />
+        <result property="recordsDoctorid"    column="records_doctorid"    />
+        <result property="recordsDiagnosticStatus"    column="records_diagnostic_status"    />
+        <result property="recordsStatus"    column="records_status"    />
+        <result property="recordsCreatedate"    column="records_createdate"    />
+        <result property="recordsAmpm"    column="records_ampm"    />
+        <result property="recordsDeptid"    column="records_deptid"    />
+        <result property="recordsNo"    column="records_no"    />
+        <result property="outpatientId"    column="outpatient_id"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="enterdate"    column="enterdate"    />
+    </resultMap>
+
+    <sql id="selectDoctorReceiverecordVo">
+        select records_id, records_doctorid, records_diagnostic_status, records_status, records_createdate, records_ampm, records_deptid, records_no, outpatient_id, operator_id, enterdate from t_medical_outpatientdoctor_receiverecord
+    </sql>
+
+    <select id="selectDoctorReceiverecordList" parameterType="com.ruoyi.medical.dto.DoctorReceiverecordDTO" resultType="com.ruoyi.medical.vo.DoctorReceiverecordVo">
+        select
+            info.outpatient_id,
+            re.records_id,
+            arc.patient_id,
+            info.outpatient_id,
+            arc.patient_name,
+            d.dept_name,
+            u.user_id as records_doctorid,
+            u.nick_name,
+            re.records_status,
+            re.records_createdate,
+            re.records_no
+        from
+            t_medical_outpatientdoctor_receiverecord re,
+            t_medical_cost_outpatient_info info ,
+            t_medical_cost_person_archives arc ,
+            sys_user u ,
+            sys_dept d
+
+        <where>
+            re.outpatient_id = info.outpatient_id and
+            info.patient_id =arc.patient_id and
+            re.records_doctorid =u.user_id and
+            re.records_deptid = d.dept_id
+
+            <if test="recordsDiagnosticStatus != null  and recordsDiagnosticStatus != ''"> and records_diagnostic_status = #{recordsDiagnosticStatus}</if>
+            <if test="recordsStatus != null  and recordsStatus != ''"> and records_status = #{recordsStatus}</if>
+            <if test="patientName != null  and patientName != ''"> and arc.patient_name like concat('%',#{patientName},'%')</if>
+        </where>
+        order by
+        re.enterdate
+        DESC,
+        re.records_status asc
+    </select>
+    
+    <select id="selectDoctorReceiverecordByRecordsId" parameterType="String" resultMap="DoctorReceiverecordResult">
+        <include refid="selectDoctorReceiverecordVo"/>
+        where records_id = #{recordsId}
+    </select>
+        
+    <insert id="insertDoctorReceiverecord" parameterType="DoctorReceiverecord">
+        insert into t_medical_outpatientdoctor_receiverecord
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recordsId != null">records_id,</if>
+            <if test="recordsDoctorid != null">records_doctorid,</if>
+            <if test="recordsDiagnosticStatus != null">records_diagnostic_status,</if>
+            <if test="recordsStatus != null">records_status,</if>
+            <if test="recordsCreatedate != null">records_createdate,</if>
+            <if test="recordsAmpm != null">records_ampm,</if>
+            <if test="recordsDeptid != null">records_deptid,</if>
+            <if test="recordsNo != null">records_no,</if>
+            <if test="outpatientId != null">outpatient_id,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="enterdate != null">enterdate,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="recordsId != null">#{recordsId},</if>
+            <if test="recordsDoctorid != null">#{recordsDoctorid},</if>
+            <if test="recordsDiagnosticStatus != null">#{recordsDiagnosticStatus},</if>
+            <if test="recordsStatus != null">#{recordsStatus},</if>
+            <if test="recordsCreatedate != null">#{recordsCreatedate},</if>
+            <if test="recordsAmpm != null">#{recordsAmpm},</if>
+            <if test="recordsDeptid != null">#{recordsDeptid},</if>
+            <if test="recordsNo != null">#{recordsNo},</if>
+            <if test="outpatientId != null">#{outpatientId},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="enterdate != null">#{enterdate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDoctorReceiverecord" parameterType="DoctorReceiverecord">
+        update t_medical_outpatientdoctor_receiverecord
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="recordsDoctorid != null">records_doctorid = #{recordsDoctorid},</if>
+            <if test="recordsDiagnosticStatus != null">records_diagnostic_status = #{recordsDiagnosticStatus},</if>
+            <if test="recordsStatus != null">records_status = #{recordsStatus},</if>
+            <if test="recordsCreatedate != null">records_createdate = #{recordsCreatedate},</if>
+            <if test="recordsAmpm != null">records_ampm = #{recordsAmpm},</if>
+            <if test="recordsDeptid != null">records_deptid = #{recordsDeptid},</if>
+            <if test="recordsNo != null">records_no = #{recordsNo},</if>
+            <if test="outpatientId != null">outpatient_id = #{outpatientId},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+            <if test="enterdate != null">enterdate = #{enterdate},</if>
+        </trim>
+        where records_id = #{recordsId}
+    </update>
+
+    <delete id="deleteDoctorReceiverecordByRecordsId" parameterType="String">
+        delete from t_medical_outpatientdoctor_receiverecord where records_id = #{recordsId}
+    </delete>
+
+    <delete id="deleteDoctorReceiverecordByRecordsIds" parameterType="String">
+        delete from t_medical_outpatientdoctor_receiverecord where records_id in 
+        <foreach item="recordsId" collection="array" open="(" separator="," close=")">
+            #{recordsId}
+        </foreach>
+    </delete>
+</mapper>

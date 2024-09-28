@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.ServiceProjectMapper">
+    
+    <resultMap type="ServiceProject" id="ServiceProjectResult">
+        <result property="serviceprojectId"    column="serviceproject_id"    />
+        <result property="serviceprojectName"    column="serviceproject_name"    />
+        <result property="serviceprojectPrice"    column="serviceproject_price"    />
+        <result property="serviceprojectDetails"    column="serviceproject_details"    />
+        <result property="serviceprojectUnit"    column="serviceproject_unit"    />
+        <result property="serviceId"    column="service_id"    />
+    </resultMap>
+
+    <sql id="selectServiceProjectVo">
+        select serviceproject_id, serviceproject_name, serviceproject_price, serviceproject_details, serviceproject_unit, service_id from t_medical_service_project
+    </sql>
+
+    <select id="selectServiceProjectList" parameterType="ServiceProject" resultMap="ServiceProjectResult">
+        <include refid="selectServiceProjectVo"/>
+        <where>  
+            <if test="serviceprojectName != null  and serviceprojectName != ''"> and serviceproject_name like concat('%', #{serviceprojectName}, '%')</if>
+            <if test="serviceprojectPrice != null "> and serviceproject_price = #{serviceprojectPrice}</if>
+            <if test="serviceprojectDetails != null  and serviceprojectDetails != ''"> and serviceproject_details = #{serviceprojectDetails}</if>
+            <if test="serviceprojectUnit != null  and serviceprojectUnit != ''"> and serviceproject_unit = #{serviceprojectUnit}</if>
+            <if test="serviceId != null "> and service_id = #{serviceId}</if>
+        </where>
+    </select>
+    
+    <select id="selectServiceProjectByServiceprojectId" parameterType="Long" resultMap="ServiceProjectResult">
+        <include refid="selectServiceProjectVo"/>
+        where serviceproject_id = #{serviceprojectId}
+    </select>
+        
+    <insert id="insertServiceProject" parameterType="ServiceProject" useGeneratedKeys="true" keyProperty="serviceprojectId">
+        insert into t_medical_service_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="serviceprojectName != null">serviceproject_name,</if>
+            <if test="serviceprojectPrice != null">serviceproject_price,</if>
+            <if test="serviceprojectDetails != null">serviceproject_details,</if>
+            <if test="serviceprojectUnit != null">serviceproject_unit,</if>
+            <if test="serviceId != null">service_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="serviceprojectName != null">#{serviceprojectName},</if>
+            <if test="serviceprojectPrice != null">#{serviceprojectPrice},</if>
+            <if test="serviceprojectDetails != null">#{serviceprojectDetails},</if>
+            <if test="serviceprojectUnit != null">#{serviceprojectUnit},</if>
+            <if test="serviceId != null">#{serviceId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateServiceProject" parameterType="ServiceProject">
+        update t_medical_service_project
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="serviceprojectName != null">serviceproject_name = #{serviceprojectName},</if>
+            <if test="serviceprojectPrice != null">serviceproject_price = #{serviceprojectPrice},</if>
+            <if test="serviceprojectDetails != null">serviceproject_details = #{serviceprojectDetails},</if>
+            <if test="serviceprojectUnit != null">serviceproject_unit = #{serviceprojectUnit},</if>
+            <if test="serviceId != null">service_id = #{serviceId},</if>
+        </trim>
+        where serviceproject_id = #{serviceprojectId}
+    </update>
+
+    <delete id="deleteServiceProjectByServiceprojectId" parameterType="Long">
+        delete from t_medical_service_project where serviceproject_id = #{serviceprojectId}
+    </delete>
+
+    <delete id="deleteServiceProjectByServiceprojectIds" parameterType="String">
+        delete from t_medical_service_project where serviceproject_id in 
+        <foreach item="serviceprojectId" collection="array" open="(" separator="," close=")">
+            #{serviceprojectId}
+        </foreach>
+    </delete>
+</mapper>

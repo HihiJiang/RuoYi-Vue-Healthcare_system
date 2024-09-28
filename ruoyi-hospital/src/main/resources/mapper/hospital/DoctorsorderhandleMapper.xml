@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.hospital.mapper.DoctorsorderhandleMapper">
+    
+    <resultMap type="Doctorsorderhandle" id="DoctorsorderhandleResult">
+        <result property="ordershId"    column="ordersh_id"    />
+        <result property="ordersId"    column="orders_id"    />
+        <result property="ordershResult"    column="ordersh_result"    />
+        <result property="ordershPersonid"    column="ordersh_personid"    />
+        <result property="ordershCreatetime"    column="ordersh_createtime"    />
+        <result property="ordershCompletetime"    column="ordersh_completetime"    />
+        <result property="ordershRemark"    column="ordersh_remark"    />
+    </resultMap>
+
+    <sql id="selectDoctorsorderhandleVo">
+        select ordersh_id, orders_id, ordersh_result, ordersh_personid, ordersh_createtime, ordersh_completetime, ordersh_remark from t_medical_cpoe_doctorsorderhandle
+    </sql>
+
+    <select id="selectDoctorsorderhandleList" parameterType="Doctorsorderhandle" resultMap="DoctorsorderhandleResult">
+        <include refid="selectDoctorsorderhandleVo"/>
+        <where>  
+            <if test="ordersId != null "> and orders_id = #{ordersId}</if>
+            <if test="ordershResult != null "> and ordersh_result = #{ordershResult}</if>
+            <if test="ordershPersonid != null "> and ordersh_personid = #{ordershPersonid}</if>
+            <if test="ordershCreatetime != null "> and ordersh_createtime like concat('%', #{ordershCreatetime}, '%')</if>
+            <if test="ordershCompletetime != null "> and ordersh_completetime like concat('%', #{ordershCompletetime}, '%')</if>
+            <if test="ordershRemark != null  and ordershRemark != ''"> and ordersh_remark like concat('%', #{ordershRemark}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectDoctorsorderhandleByOrdershId" parameterType="Long" resultMap="DoctorsorderhandleResult">
+        <include refid="selectDoctorsorderhandleVo"/>
+        where ordersh_id = #{ordershId}
+    </select>
+        
+    <insert id="insertDoctorsorderhandle" parameterType="Doctorsorderhandle" useGeneratedKeys="true" keyProperty="ordershId">
+        insert into t_medical_cpoe_doctorsorderhandle
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ordersId != null">orders_id,</if>
+            <if test="ordershResult != null">ordersh_result,</if>
+            <if test="ordershPersonid != null">ordersh_personid,</if>
+            <if test="ordershCreatetime != null">ordersh_createtime,</if>
+            <if test="ordershCompletetime != null">ordersh_completetime,</if>
+            <if test="ordershRemark != null">ordersh_remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ordersId != null">#{ordersId},</if>
+            <if test="ordershResult != null">#{ordershResult},</if>
+            <if test="ordershPersonid != null">#{ordershPersonid},</if>
+            <if test="ordershCreatetime != null">#{ordershCreatetime},</if>
+            <if test="ordershCompletetime != null">#{ordershCompletetime},</if>
+            <if test="ordershRemark != null">#{ordershRemark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDoctorsorderhandle" parameterType="Doctorsorderhandle">
+        update t_medical_cpoe_doctorsorderhandle
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ordersId != null">orders_id = #{ordersId},</if>
+            <if test="ordershResult != null">ordersh_result = #{ordershResult},</if>
+            <if test="ordershPersonid != null">ordersh_personid = #{ordershPersonid},</if>
+            <if test="ordershCreatetime != null">ordersh_createtime = #{ordershCreatetime},</if>
+            <if test="ordershCompletetime != null">ordersh_completetime = #{ordershCompletetime},</if>
+            <if test="ordershRemark != null">ordersh_remark = #{ordershRemark},</if>
+        </trim>
+        where ordersh_id = #{ordershId}
+    </update>
+
+    <delete id="deleteDoctorsorderhandleByOrdershId" parameterType="Long">
+        delete from t_medical_cpoe_doctorsorderhandle where ordersh_id = #{ordershId}
+    </delete>
+
+    <delete id="deleteDoctorsorderhandleByOrdershIds" parameterType="String">
+        delete from t_medical_cpoe_doctorsorderhandle where ordersh_id in 
+        <foreach item="ordershId" collection="array" open="(" separator="," close=")">
+            #{ordershId}
+        </foreach>
+    </delete>
+</mapper>

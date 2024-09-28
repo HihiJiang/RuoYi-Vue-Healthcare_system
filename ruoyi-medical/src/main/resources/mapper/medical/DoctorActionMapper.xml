@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.DoctorActionMapper">
+    
+    <resultMap type="DoctorAction" id="DoctorActionResult">
+        <result property="actionId"    column="action_id"    />
+        <result property="actionPartname"    column="action_partname"    />
+        <result property="actionPartnumber"    column="action_partnumber"    />
+        <result property="actionPatienttype"    column="action_patienttype"    />
+        <result property="actionPartmoney"    column="action_partmoney"    />
+        <result property="actionType"    column="action_type"    />
+        <result property="recordsId"    column="records_id"    />
+    </resultMap>
+
+    <sql id="selectDoctorActionVo">
+        select action_id, action_partname, action_partnumber, action_patienttype, action_partmoney, action_type, records_id from t_medical_outpatientdoctor_action
+    </sql>
+
+    <select id="selectDoctorActionList" parameterType="DoctorAction" resultMap="DoctorActionResult">
+        <include refid="selectDoctorActionVo"/>
+        <where>  
+            <if test="actionPartname != null  and actionPartname != ''"> and action_partname like concat('%', #{actionPartname}, '%')</if>
+            <if test="actionPartnumber != null "> and action_partnumber = #{actionPartnumber}</if>
+            <if test="actionPatienttype != null  and actionPatienttype != ''"> and action_patienttype = #{actionPatienttype}</if>
+            <if test="actionPartmoney != null "> and action_partmoney = #{actionPartmoney}</if>
+            <if test="actionType != null  and actionType != ''"> and action_type = #{actionType}</if>
+            <if test="recordsId != null  and recordsId != ''"> and records_id = #{recordsId}</if>
+        </where>
+    </select>
+    
+    <select id="selectDoctorActionByActionId" parameterType="Long" resultMap="DoctorActionResult">
+        <include refid="selectDoctorActionVo"/>
+        where action_id = #{actionId}
+    </select>
+        
+    <insert id="insertDoctorAction" parameterType="DoctorAction" useGeneratedKeys="true" keyProperty="actionId">
+        insert into t_medical_outpatientdoctor_action
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="actionPartname != null">action_partname,</if>
+            <if test="actionPartnumber != null">action_partnumber,</if>
+            <if test="actionPatienttype != null">action_patienttype,</if>
+            <if test="actionPartmoney != null">action_partmoney,</if>
+            <if test="actionType != null">action_type,</if>
+            <if test="recordsId != null">records_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="actionPartname != null">#{actionPartname},</if>
+            <if test="actionPartnumber != null">#{actionPartnumber},</if>
+            <if test="actionPatienttype != null">#{actionPatienttype},</if>
+            <if test="actionPartmoney != null">#{actionPartmoney},</if>
+            <if test="actionType != null">#{actionType},</if>
+            <if test="recordsId != null">#{recordsId},</if>
+         </trim>
+    </insert>
+    <insert id="addDoctorActionBatch">
+        insert into t_medical_outpatientdoctor_action(action_partname,action_partnumber,action_patienttype,action_partmoney,
+                                                      action_type,records_id)
+        values
+            <foreach collection="lst" item="it" separator=",">
+                (#{it.actionPartname},#{it.actionPartnumber},#{it.actionPatienttype},#{it.actionPartmoney},#{it.actionType},#{it.recordsId})
+            </foreach>
+
+    </insert>
+
+    <update id="updateDoctorAction" parameterType="DoctorAction">
+        update t_medical_outpatientdoctor_action
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="actionPartname != null">action_partname = #{actionPartname},</if>
+            <if test="actionPartnumber != null">action_partnumber = #{actionPartnumber},</if>
+            <if test="actionPatienttype != null">action_patienttype = #{actionPatienttype},</if>
+            <if test="actionPartmoney != null">action_partmoney = #{actionPartmoney},</if>
+            <if test="actionType != null">action_type = #{actionType},</if>
+            <if test="recordsId != null">records_id = #{recordsId},</if>
+        </trim>
+        where action_id = #{actionId}
+    </update>
+
+    <delete id="deleteDoctorActionByActionId" parameterType="Long">
+        delete from t_medical_outpatientdoctor_action where action_id = #{actionId}
+    </delete>
+
+    <delete id="deleteDoctorActionByActionIds" parameterType="String">
+        delete from t_medical_outpatientdoctor_action where action_id in 
+        <foreach item="actionId" collection="array" open="(" separator="," close=")">
+            #{actionId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.PacsInfoMapper">
+    
+    <resultMap type="PacsInfo" id="PacsInfoResult">
+        <result property="pacsId"    column="pacs_id"    />
+        <result property="pacsPartname"    column="pacs_partname"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="doctorId"    column="doctor_id"    />
+        <result property="pacsStatus"    column="pacs_status"    />
+        <result property="pacsCreatedate"    column="pacs_createdate"    />
+        <result property="recordsId"    column="records_id"    />
+        <result property="pacsSickname"    column="pacs_sickname"    />
+        <result property="pacsResult"    column="pacs_result"    />
+    </resultMap>
+
+    <sql id="selectPacsInfoVo">
+        select pacs_id, pacs_partname, patient_id, doctor_id, pacs_status, pacs_createdate, records_id, pacs_sickname, pacs_result from t_medical_pacs_info
+    </sql>
+
+    <select id="selectPacsInfoList" parameterType="com.ruoyi.medical.dto.PacsInfoDTO" resultType="com.ruoyi.medical.vo.PacsInfoVo">
+        SELECT
+        ps.*,arc.patient_name,u.nick_name
+        FROM
+        t_medical_pacs_info ps ,
+        t_medical_cost_person_archives arc ,
+        sys_user u
+
+        <where>
+            ps.patient_id=arc.patient_id and
+            ps.doctor_id=u.user_id
+            <if test="patientName != null  and patientName != ''"> and arc.patient_name like concal('%',#{patientName},'%')</if>
+<!--            <if test="patientId != null  and patientId != ''"> and patient_id = #{patientId}</if>-->
+<!--            <if test="doctorId != null "> and doctor_id = #{doctorId}</if>-->
+            <if test="pacsStatus != null  and pacsStatus != ''"> and pacs_status = #{pacsStatus}</if>
+<!--            <if test="pacsCreatedate != null "> and pacs_createdate = #{pacsCreatedate}</if>-->
+<!--            <if test="recordsId != null  and recordsId != ''"> and records_id = #{recordsId}</if>-->
+<!--            <if test="pacsSickname != null  and pacsSickname != ''"> and pacs_sickname like concat('%', #{pacsSickname}, '%')</if>-->
+<!--            <if test="pacsResult != null  and pacsResult != ''"> and pacs_result = #{pacsResult}</if>-->
+        </where>
+        ORDER BY ps.pacs_createdate desc
+    </select>
+    
+    <select id="selectPacsInfoByPacsId" parameterType="Long" resultMap="PacsInfoResult">
+        <include refid="selectPacsInfoVo"/>
+        where pacs_id = #{pacsId}
+    </select>
+        
+    <insert id="insertPacsInfo" parameterType="PacsInfo" useGeneratedKeys="true" keyProperty="pacsId">
+        insert into t_medical_pacs_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pacsPartname != null">pacs_partname,</if>
+            <if test="patientId != null">patient_id,</if>
+            <if test="doctorId != null">doctor_id,</if>
+            <if test="pacsStatus != null">pacs_status,</if>
+            <if test="pacsCreatedate != null">pacs_createdate,</if>
+            <if test="recordsId != null">records_id,</if>
+            <if test="pacsSickname != null">pacs_sickname,</if>
+            <if test="pacsResult != null">pacs_result,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pacsPartname != null">#{pacsPartname},</if>
+            <if test="patientId != null">#{patientId},</if>
+            <if test="doctorId != null">#{doctorId},</if>
+            <if test="pacsStatus != null">#{pacsStatus},</if>
+            <if test="pacsCreatedate != null">#{pacsCreatedate},</if>
+            <if test="recordsId != null">#{recordsId},</if>
+            <if test="pacsSickname != null">#{pacsSickname},</if>
+            <if test="pacsResult != null">#{pacsResult},</if>
+         </trim>
+    </insert>
+    <insert id="addPacsBatch">
+        insert into t_medical_pacs_info
+            (pacs_partname,patient_id,doctor_id,records_id)
+        values
+            <foreach collection="lst" item="it" separator=",">
+                (#{it.pacsPartname},#{it.patientId},#{it.doctorId},#{it.recordsId})
+            </foreach>
+    </insert>
+
+    <update id="updatePacsInfo" parameterType="PacsInfo">
+        update t_medical_pacs_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pacsPartname != null">pacs_partname = #{pacsPartname},</if>
+            <if test="patientId != null">patient_id = #{patientId},</if>
+            <if test="doctorId != null">doctor_id = #{doctorId},</if>
+            <if test="pacsStatus != null">pacs_status = #{pacsStatus},</if>
+            <if test="pacsCreatedate != null">pacs_createdate = #{pacsCreatedate},</if>
+            <if test="recordsId != null">records_id = #{recordsId},</if>
+            <if test="pacsSickname != null">pacs_sickname = #{pacsSickname},</if>
+            <if test="pacsResult != null">pacs_result = #{pacsResult},</if>
+        </trim>
+        where pacs_id = #{pacsId}
+    </update>
+
+    <delete id="deletePacsInfoByPacsId" parameterType="Long">
+        delete from t_medical_pacs_info where pacs_id = #{pacsId}
+    </delete>
+
+    <delete id="deletePacsInfoByPacsIds" parameterType="String">
+        delete from t_medical_pacs_info where pacs_id in 
+        <foreach item="pacsId" collection="array" open="(" separator="," close=")">
+            #{pacsId}
+        </foreach>
+    </delete>
+</mapper>

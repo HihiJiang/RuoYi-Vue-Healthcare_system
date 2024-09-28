@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.medical.mapper.DoctorResultMapper">
+    
+    <resultMap type="DoctorResult" id="DoctorResultResult">
+        <result property="resultId"    column="result_id"    />
+        <result property="resultName"    column="result_name"    />
+        <result property="resultDescription"    column="result_description"    />
+        <result property="resultRemark"    column="result_remark"    />
+        <result property="resultCreatedate"    column="result_createdate"    />
+        <result property="recordsId"    column="records_id"    />
+    </resultMap>
+
+    <sql id="selectDoctorResultVo">
+        select result_id, result_name, result_description, result_remark, result_createdate, records_id from t_medical_outpatientdoctor_result
+    </sql>
+
+    <select id="selectDoctorResultList" parameterType="DoctorResult" resultMap="DoctorResultResult">
+        <include refid="selectDoctorResultVo"/>
+        <where>  
+            <if test="resultName != null  and resultName != ''"> and result_name like concat('%', #{resultName}, '%')</if>
+            <if test="resultDescription != null  and resultDescription != ''"> and result_description = #{resultDescription}</if>
+            <if test="resultRemark != null  and resultRemark != ''"> and result_remark = #{resultRemark}</if>
+            <if test="resultCreatedate != null "> and result_createdate = #{resultCreatedate}</if>
+            <if test="recordsId != null  and recordsId != ''"> and records_id = #{recordsId}</if>
+        </where>
+    </select>
+    
+    <select id="selectDoctorResultByResultId" parameterType="Long" resultMap="DoctorResultResult">
+        <include refid="selectDoctorResultVo"/>
+        where result_id = #{resultId}
+    </select>
+        
+    <insert id="insertDoctorResult" parameterType="DoctorResult" useGeneratedKeys="true" keyProperty="resultId">
+        insert into t_medical_outpatientdoctor_result
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="resultName != null">result_name,</if>
+            <if test="resultDescription != null">result_description,</if>
+            <if test="resultRemark != null">result_remark,</if>
+            <if test="resultCreatedate != null">result_createdate,</if>
+            <if test="recordsId != null">records_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="resultName != null">#{resultName},</if>
+            <if test="resultDescription != null">#{resultDescription},</if>
+            <if test="resultRemark != null">#{resultRemark},</if>
+            <if test="resultCreatedate != null">#{resultCreatedate},</if>
+            <if test="recordsId != null">#{recordsId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDoctorResult" parameterType="DoctorResult">
+        update t_medical_outpatientdoctor_result
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="resultName != null">result_name = #{resultName},</if>
+            <if test="resultDescription != null">result_description = #{resultDescription},</if>
+            <if test="resultRemark != null">result_remark = #{resultRemark},</if>
+            <if test="resultCreatedate != null">result_createdate = #{resultCreatedate},</if>
+            <if test="recordsId != null">records_id = #{recordsId},</if>
+        </trim>
+        where result_id = #{resultId}
+    </update>
+
+    <delete id="deleteDoctorResultByResultId" parameterType="Long">
+        delete from t_medical_outpatientdoctor_result where result_id = #{resultId}
+    </delete>
+
+    <delete id="deleteDoctorResultByResultIds" parameterType="String">
+        delete from t_medical_outpatientdoctor_result where result_id in 
+        <foreach item="resultId" collection="array" open="(" separator="," close=")">
+            #{resultId}
+        </foreach>
+    </delete>
+</mapper>
